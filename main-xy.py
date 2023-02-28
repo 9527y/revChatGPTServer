@@ -43,12 +43,12 @@ async def read_root(body: Item, response: Response):
              "content": {"content_type": "text", "parts": [body.prompt]}
              }],
         "conversation_id": body.conversation_id if body.conversation_id else None,
-        "parent_message_id": body.parent_id if body.parent_id else uuid.uuid4(),
+        "parent_message_id": body.parent_id if body.parent_id else str(uuid.uuid4()),
         "model": "text-davinci-002-render"
     }
     logger.info(data)
     try:
-        result = chatbot.ask(body.prompt, parent_id=body.parent_id, conversation_id=body.conversation_id)
+        result = chatbot.ask(body.prompt, parent_id=body.parent_id, conversation_id=body.conversation_id, timeout=10)
         if result:
             return {"response": result}
         else:
@@ -56,7 +56,8 @@ async def read_root(body: Item, response: Response):
     except Exception as e:
         chatbot.reset_chat()
         try:
-            result = chatbot.ask(body.prompt, parent_id=body.parent_id, conversation_id=body.conversation_id)
+            result = chatbot.ask(body.prompt, parent_id=body.parent_id, conversation_id=body.conversation_id,
+                                 timeout=10)
             if result:
                 return {"response": result}
             else:
